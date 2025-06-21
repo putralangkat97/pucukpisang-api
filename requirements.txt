@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+faster-whisper
+ctransformers[metal]
+transformers
+torch
