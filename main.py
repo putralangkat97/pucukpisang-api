@@ -26,7 +26,8 @@ def load_model(provider_env_var, local_path_env_var, api_model_name_var, local_m
                 from ctransformers import AutoModelForCausalLM
                 logging.info(f"Loading {log_name} model from local path: {local_path}...")
                 # Offload all possible layers to GPU for best performance
-                return AutoModelForCausalLM.from_pretrained(local_path, model_type=local_model_type, gpu_layers=999)
+                GPU_LAYERS = int(os.getenv("GPU_LAYERS", 0))
+                return AutoModelForCausalLM.from_pretrained(local_path, model_type=local_model_type, gpu_layers=GPU_LAYERS)
             else:
                 logging.warning(f"🔥 {log_name} provider set to 'local' but path not found. Service will be disabled.")
                 return None
@@ -46,7 +47,8 @@ def load_model(provider_env_var, local_path_env_var, api_model_name_var, local_m
 # --- Load AI Models ONCE on Startup ---
 try:
     from faster_whisper import WhisperModel
-    transcriber = WhisperModel(os.getenv("WHISPER_MODEL_NAME", "base"), device="mps", compute_type="float16")
+    DEVICE = os.getenv("AI_DEVICE", "cpu")
+    transcriber = WhisperModel(os.getenv("WHISPER_MODEL_NAME", "base"), device=DEVICE, compute_type="int8" if DEVICE == "cpu" else "float16")
     logging.info(f"✅ Whisper model '{os.getenv('WHISPER_MODEL_NAME')}' loaded successfully.")
 except Exception as e:
     transcriber = None; logging.error(f"🔥 Whisper could not be loaded: {e}")
