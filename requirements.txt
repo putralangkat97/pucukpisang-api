@@ -6,3 +6,4 @@ ctransformers[metal]
 transformers
 torch
 gunicorn
+python-multipart
